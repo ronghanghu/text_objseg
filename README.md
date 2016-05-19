@@ -18,6 +18,13 @@ License: BSD 2-Clause license
 1. Install Google TensorFlow (v0.7.0 or higher) following the instructions [here](https://www.tensorflow.org/versions/master/get_started/os_setup.html).
 2. Download this repository or clone with Git, and then `cd` into the root directory of the repository.
 
+## Demo
+1. Download the trained models:  
+`exp-referit/tfmodel/download_trained_models.sh`.
+2. Run the language-based segmentation model demo in `./demo/text_objseg_demo.ipynb` with [Jupyter Notebook (IPython Notebook)](http://ipython.org/notebook.html).
+
+![Image](http://www.eecs.berkeley.edu/~ronghang/projects/text_objseg/text_objseg_demo.jpg)
+
 ## Training and evaluation on ReferIt Dataset
 
 ### Download dataset and VGG network
