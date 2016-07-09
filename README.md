@@ -12,7 +12,6 @@ This repository contains the code for the following paper:
 ```
 
 Project Page: http://ronghanghu.com/text_objseg  
-License: BSD 2-Clause license
 
 ## Installation
 1. Install Google TensorFlow (v0.7.0 or higher) following the instructions [here](https://www.tensorflow.org/versions/master/get_started/os_setup.html).
