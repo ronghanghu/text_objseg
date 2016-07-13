@@ -108,7 +108,7 @@ for n_im in range(num_im):
 
     imcrop_val[...] = processed_im.astype(np.float32) - segmodel.vgg_net.channel_mean
     for imcrop_name, _, description in flat_query_dict[imname]:
-        mask = load_gt_mask(mask_dir + imcrop_name[:-4] + '.mat').astype(np.float32)
+        mask = load_gt_mask(mask_dir + imcrop_name + '.mat').astype(np.float32)
         labels = (mask > 0)
         processed_labels = im_processing.resize_and_pad(mask, input_H, input_W) > 0
 

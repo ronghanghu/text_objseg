@@ -52,7 +52,7 @@ for n_imcrop in range(num_imcrop):
 
     # Image and mask
     imname = imcrop_name.split('_', 1)[0] + '.jpg'
-    mask_name = imcrop_name[:-4] + '.mat'
+    mask_name = imcrop_name + '.mat'
     im = skimage.io.imread(image_dir + imname)
     mask = load_gt_mask(mask_dir + mask_name).astype(np.float32)
 
