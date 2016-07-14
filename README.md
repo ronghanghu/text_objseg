@@ -33,27 +33,28 @@ Project Page: http://ronghanghu.com/text_objseg
 `models/convert_caffemodel/params/download_vgg_params.sh`.
 
 ### Training
-3. Build training batches for bounding boxes:  
+3. You may need to add the repository root directory to Python's module path: `export PYTHONPATH=.:$PYTHONPATH`.
+4. Build training batches for bounding boxes:  
 `python exp-referit/build_training_batches_det.py`.
-4. Build training batches for segmentation:  
+5. Build training batches for segmentation:  
 `python exp-referit/build_training_batches_seg.py`.
-5. Select the GPU you want to use during training:  
+6. Select the GPU you want to use during training:  
 `export GPU_ID=<gpu id>`. Use 0 for `<gpu id>` if you only have one GPU on your machine.
 5. Train the language-based bounding box localization model:  
 `python exp-referit/exp_train_referit_det.py $GPU_ID`.
-6. Train the low resolution language-based segmentation model (from the previous bounding box localization model):  
+7. Train the low resolution language-based segmentation model (from the previous bounding box localization model):  
 `python exp-referit/init_referit_seg_lowres_from_det.py && python exp-referit/exp_train_referit_seg_lowres.py $GPU_ID`.
-7. Train the high resolution language-based segmentation model (from the previous low resolution segmentation model):  
+8. Train the high resolution language-based segmentation model (from the previous low resolution segmentation model):  
 `python exp-referit/init_referit_seg_highres_from_lowres.py && python exp-referit/exp_train_referit_seg_highres.py $GPU_ID`.
 
 **Alternatively, you may skip the training procedure and download the trained models directly**:  
 `exp-referit/tfmodel/download_trained_models.sh`.
 
 ### Evaluation
-8. Select the GPU you want to use during testing: `export GPU_ID=<gpu id>`. Use 0 for `<gpu id>` if you only have one GPU on your machine.
-9. Run evaluation for the high resolution language-based segmentation model:  
+9. Select the GPU you want to use during testing: `export GPU_ID=<gpu id>`. Use 0 for `<gpu id>` if you only have one GPU on your machine. Also, you may need to add the repository root directory to Python's module path: `export PYTHONPATH=.:$PYTHONPATH`.
+10. Run evaluation for the high resolution language-based segmentation model:  
 `python exp-referit/exp_test_referit_seg.py $GPU_ID`  
 This should reproduce the results in the paper.
-10. You may also evaluate the language-based bounding box localization model:  
+11. You may also evaluate the language-based bounding box localization model:  
 `python exp-referit/exp_test_referit_det.py $GPU_ID`  
 The results can be compared to [this paper](http://ronghanghu.com/text_obj_retrieval/).
