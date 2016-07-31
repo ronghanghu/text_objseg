@@ -1,12 +1,12 @@
 # Segmentation from Natural Language Expressions
 This repository contains the code for the following paper:
 
-* R. Hu, M. Rohrbach, T. Darrell, *Segmentation from Natural Language Expressions*. in arXiv:1603.06180, 2016. ([PDF](http://arxiv.org/pdf/1603.06180))
+* R. Hu, M. Rohrbach, T. Darrell, *Segmentation from Natural Language Expressions*. in ECCV, 2016. ([PDF](http://arxiv.org/pdf/1603.06180))
 ```
 @article{hu2016segmentation,
   title={Segmentation from Natural Language Expressions},
   author={Hu, Ronghang and Rohrbach, Marcus and Darrell, Trevor},
-  journal={arXiv preprint arXiv:1603.06180},
+  journal={Proceedings of the European Conference on Computer Vision (ECCV)},
   year={2016}
 }
 ```
