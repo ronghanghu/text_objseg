@@ -21,3 +21,6 @@ exp-referit/referit-dataset/*
 *-Copy*.ipynb
 
 checkpoint
+
+demo/uploads/*
+demo/viz/*

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Natural Language Image Segmentation Demo</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.js"></script>
+	<style type="text/css">
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			color: #003262;
+		}
+		.container {
+			margin: 0 auto;
+			max-width: 960px;
+			padding: 0 10px;
+		}
+		header {
+			background-color: #003262;
+			padding: 20px 0;
+			margin-bottom: 20px;
+		}
+		header h1 {
+			color: #FDB515;
+			margin-bottom: 5px;
+		}
+		header p {
+			color: white;
+		}
+		#my-dropzone {
+			border: 2px dashed #DDD5C7;
+			padding: 20px;
+			text-align: center;
+			font-size: 1.5rem;
+			border-radius: 3px;
+			margin-bottom: 20px;
+		}
+		#my-dropzone.dz-drag-hover {
+			border: 2px dashed #00B0DA;
+		}
+		#my-camerazone {
+			border: 2px dashed #DDD5C7;
+			padding: 10px;
+			border-radius: 3px;
+		}
+		a {
+			color: #00B0DA;
+		}
+		.dz-details, .dz-progress, .dz-success-mark, .dz-error-mark {
+			display: none;
+		}
+
+		input[type="number"] {
+			border: 2px solid #DDD5C7;
+			font-size: 1.0rem;
+			padding: 0px;
+			outline: none;
+			border-radius: 3px;
+			width: 80px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+		input[type="number"]:focus {
+			border-color: #00B0DA;
+		}
+		input[type="text"] {
+			border: 2px solid #DDD5C7;
+			font-size: 1.5rem;
+			padding: 10px;
+			outline: none;
+			border-radius: 3px;
+			width: 100%;
+			margin-bottom: 10px;
+		}
+		input[type="text"]:focus {
+			border-color: #00B0DA;
+		}
+		input[type="button"] {
+			border: 2px solid #666666;
+			font-size: 1.0rem;
+			padding: 5px;
+			outline: none;
+			border-radius: 3px;
+			width: 250px;
+			height: 40px;
+			margin-bottom: 15px;
+		}
+		input[type="button"]:focus {
+			border-color: #00B0DA;
+		}
+		#answer {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		#answer p {
+			color: #888;
+			font-size: 1.25rem;
+		}
+		#answer p:first-of-type {
+			color: #003262;
+			font-weight: bold;
+			font-size: 1.5rem;
+		}
+		#viz {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		#viz img {
+			height: 350px;
+			border: 1px solid #003262;
+		}
+		#status {
+			text-align: center;
+			margin-bottom: 20px;
+			font-size: 0.9rem;
+			color: #888;
+		}
+		hr {
+			height: 0;
+			border: 0;
+			border-bottom: 1px solid #DDD5C7;
+			margin-bottom: 20px;
+		}
+		p {
+			font-size: 0.9rem;
+		}
+		footer {
+			margin-bottom: 20px;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="container">
+			<h1>Natural Language Image Segmentation Demo</h1>
+			<p></p>
+		</div>
+	</header>
+	<div class="container">
+		<h2>Upload an image or take an image with web camera</h2>
+		<br />
+		<form action="/api/upload_image" class="dropzone" id="my-dropzone">
+		</form>
+		<table style="width: 100%" id="my-camerazone">
+			<tr>
+				<td><h4>Camera input</h4><div style="width: 320px;" id="my_camera"></div></td>
+				<td>
+					<input type="button" value="Take a single image" onClick="take_one_image();" /><br />
+					<input type="button" value="Run webcam continuously" onClick="start_webcam();" /><br />
+					<input type="button" value="Stop running webcam" onClick="stop_webcam();" /><br />
+				</td>
+				<td><div style="width: 320px; height: 260px;" id="results"></div></td>
+			</tr>
+		</table>
+		<input type="text" placeholder="Type a query and hit enter..." id="question" />
+
+		<div id="answer">
+
+		</div>
+		<div id="viz">
+
+		</div>
+		<div id="status">
+
+		</div>
+		<hr>
+		<footer>
+		<p>System created by UC Berkeley. <a href="http://ronghanghu.com/text_objseg/">Project Page</a></p>
+		</footer>
+	</div>
+
+	<script type="text/javascript">
+		function clearResponse() {
+			$('#answer').html('');
+			$('#viz').html('');
+			$('#status').html('');
+		}
+
+		current_image_id = '';
+		webcam_started = false;
+		webcam_frames = 0;
+		Dropzone.options.myDropzone = {
+			init: function() {
+				this.on('addedfile', function() {
+					$('.dz-default').hide();
+				});
+				this.on('removedfile', function() {
+					$('.dz-default').show();
+					current_image_id = '';
+					clearResponse();
+				});
+				this.on('success', function(file, response) {
+					if (response.error) {
+						this.removeAllFiles();
+						alert(response.error);
+					} else {
+						current_image_id = response.img_id;
+					}
+				});
+				this.on('error', function(file, message, xhr) {
+					alert(message);
+				});
+				this.on('drop', function() {
+					this.removeAllFiles();
+				});
+			},
+			addRemoveLinks: true,
+			uploadMultiple: false,
+			dictRemoveFile: "Clear",
+			dictDefaultMessage: "Drop image here to upload",
+			thumbnailWidth: null,
+			thumbnailHeight: 200,
+			maxThumbnailFilesize: 20
+		}
+		function captureImage(raw_img_string) {
+			$.post('/api/capture_image', {
+				'raw_img_string': raw_img_string
+			}, function(response) {
+				if (response.error) {
+					clearResponse();
+					alert(response.error);
+				} else {
+					current_image_id = response.img_id;
+
+					if (webcam_started) {
+						if ($('#question').val() == "") {
+		          alert("Please type a query.");
+		          return;
+		        }
+						$('#status').text('Computing...');
+						uploadQuestion($('#question').val());
+					}
+				}
+			})
+		}
+		function uploadQuestion(question) {
+			$.post('/api/upload_question', {
+				'img_id': current_image_id,
+				'question': question
+			}, function(response) {
+				if (response.error) {
+					clearResponse();
+					alert(response.error);
+				} else {
+					displayAnswers(response.answers, response.scores, response.viz, response.time);
+				}
+			})
+		}
+		function displayAnswers(answers, scores, viz, time) {
+			strings = []
+			$('#answer').html(strings.join(' '));
+			$('#viz').html('<img src="/' + viz[0] + '" />');
+			$('#status').text('Results, foreground in red, background in blue.');
+
+			// Take the next frame
+			if (webcam_started) {
+				webcam_frames += 1;
+				take_snapshot();
+			}
+		}
+		$('#question').keypress(function(e) {
+			if (e.which == 13) {
+        if ($('#question').val() == "") {
+          alert("Please type a query.");
+          return;
+        }
+				$('#question').blur();
+				clearResponse();
+				$('#status').text('Computing...');
+				uploadQuestion($('#question').val());
+			}
+		});
+	</script>
+
+	<!-- First, include the Webcam.js JavaScript Library -->
+	<script type="text/javascript" src="scripts/webcam.js"></script>
+
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 320,
+			height: 240,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+		function take_snapshot() {
+			// take snapshot and get image data
+			Webcam.snap( function(data_uri) {
+				// display results in page
+				document.getElementById('results').innerHTML =
+						'<h4>last image from camera</h4><img src="'+data_uri+'"/>';
+				captureImage(data_uri);
+			} );
+		}
+
+		function start_webcam() {
+			webcam_started = true;
+			webcam_frames = 0;
+			take_snapshot();
+		}
+		function stop_webcam() {
+			webcam_started = false;
+		}
+		function take_one_image() {
+			webcam_started = false;
+			take_snapshot();
+		}
+	</script>
+</body>
+</html>
