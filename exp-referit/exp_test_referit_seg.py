@@ -53,7 +53,17 @@ scores = segmodel.text_objseg_upsample32s(text_seq_batch, imcrop_batch,
     mlp_dropout=False)
 
 # Load pretrained model
-snapshot_restorer = tf.train.Saver()
+variable_name_mapping= None
+if tf.__version__.split('.')[0] == '1':
+    variable_name_mapping = {
+        v.op.name.replace(
+            'rnn/multi_rnn_cell/cell_0/basic_lstm_cell/kernel',
+            'RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Matrix').replace(
+            'rnn/multi_rnn_cell/cell_0/basic_lstm_cell/bias',
+            'RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Bias'): v
+        for v in tf.global_variables()}
+
+snapshot_restorer = tf.train.Saver(variable_name_mapping)
 sess = tf.Session()
 snapshot_restorer.restore(sess, pretrained_model)
 

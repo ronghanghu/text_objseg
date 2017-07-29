@@ -23,7 +23,7 @@ def text_objseg_region(text_seq_batch, imcrop_batch, spatial_batch, num_vocab,
 
     # L2-normalize the features (except for spatial_batch)
     # and concatenate them
-    feat_all = tf.concat(1, [tf.nn.l2_normalize(feat_lang, 1),
+    feat_all = tf.concat(axis=1, values=[tf.nn.l2_normalize(feat_lang, 1),
                              tf.nn.l2_normalize(feat_vis, 1),
                              spatial_batch])
 
@@ -54,7 +54,7 @@ def text_objseg_full_conv(text_seq_batch, imcrop_batch, num_vocab, embed_dim,
     # L2-normalize the features (except for spatial_batch)
     # and concatenate them along axis 3 (channel dimension)
     spatial_batch = tf.convert_to_tensor(generate_spatial_batch(N, featmap_H, featmap_W))
-    feat_all = tf.concat(3, [tf.nn.l2_normalize(feat_lang, 3),
+    feat_all = tf.concat(axis=3, values=[tf.nn.l2_normalize(feat_lang, 3),
                              tf.nn.l2_normalize(feat_vis, 3),
                              spatial_batch])
 

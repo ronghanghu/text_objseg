@@ -32,7 +32,7 @@ _ = segmodel.text_objseg_upsample32s(text_seq_batch, imcrop_batch,
     num_vocab, embed_dim, lstm_dim, mlp_hidden_dims,
     vgg_dropout=False, mlp_dropout=False)
 
-load_var = {var.op.name: var for var in tf.all_variables()
+load_var = {var.op.name: var for var in tf.global_variables()
             if not var.op.name.startswith('classifier/upsample32s')}
 snapshot_loader = tf.train.Saver(load_var)
 with tf.variable_scope('classifier', reuse=True):

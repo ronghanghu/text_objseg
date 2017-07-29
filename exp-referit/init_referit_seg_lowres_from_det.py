@@ -38,7 +38,7 @@ _ = segmodel.text_objseg_region(text_seq_batch, imcrop_batch,
 snapshot_loader = tf.train.Saver()
 with tf.Session() as sess:
     snapshot_loader.restore(sess, det_model)
-    variable_dict = {var.name:var.eval(session=sess) for var in tf.all_variables()}
+    variable_dict = {var.name:var.eval(session=sess) for var in tf.global_variables()}
 
 ################################################################################
 # low resolution segmentation network
@@ -57,7 +57,7 @@ _ = segmodel.text_objseg_full_conv(text_seq_batch, imcrop_batch,
 
 # Assign outputs
 assign_ops = []
-for var in tf.all_variables():
+for var in tf.global_variables():
     assign_ops.append(tf.assign(var, variable_dict[var.name].reshape(var.get_shape().as_list())))
 
 # Save segmentation model initialization

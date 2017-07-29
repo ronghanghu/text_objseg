@@ -62,7 +62,7 @@ fc8_crop = vgg_net.vgg_fc8(imcrop_batch, 'vgg_local', apply_dropout=False)
 
 # L2-normalize the features (except for spatial_batch)
 # and concatenate them along axis 1 (feature dimension)
-feat_all = tf.concat(1, [tf.nn.l2_normalize(lstm_top_batch, 1),
+feat_all = tf.concat(axis=1, values=[tf.nn.l2_normalize(lstm_top_batch, 1),
                          tf.nn.l2_normalize(fc8_crop_batch, 1),
                          spatial_batch])
 
@@ -74,7 +74,17 @@ with tf.variable_scope('classifier'):
 scores = mlp_l2
 
 # Load pretrained model
-snapshot_saver = tf.train.Saver()
+variable_name_mapping= None
+if tf.__version__.split('.')[0] == '1':
+    variable_name_mapping = {
+        v.op.name.replace(
+            'rnn/multi_rnn_cell/cell_0/basic_lstm_cell/kernel',
+            'RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Matrix').replace(
+            'rnn/multi_rnn_cell/cell_0/basic_lstm_cell/bias',
+            'RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Bias'): v
+        for v in tf.global_variables()}
+
+snapshot_restorer = tf.train.Saver(variable_name_mapping)
 sess = tf.Session()
 snapshot_saver.restore(sess, pretrained_model)
 

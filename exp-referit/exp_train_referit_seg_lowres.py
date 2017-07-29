@@ -114,7 +114,7 @@ solver = tf.train.MomentumOptimizer(learning_rate=learning_rate, momentum=moment
 # Compute gradients
 grads_and_vars = solver.compute_gradients(total_loss, var_list=train_var_list)
 # Apply learning rate multiplication to gradients
-grads_and_vars = [((g if var_lr_mult[v] == 1 else tf.mul(var_lr_mult[v], g)), v)
+grads_and_vars = [((g if var_lr_mult[v] == 1 else tf.multiply(var_lr_mult[v], g)), v)
                   for g, v in grads_and_vars]
 # Apply gradients
 train_step = solver.apply_gradients(grads_and_vars, global_step=global_step)
@@ -132,7 +132,7 @@ snapshot_saver = tf.train.Saver()
 sess = tf.Session()
 
 # Run Initialization operations
-sess.run(tf.initialize_all_variables())
+sess.run(tf.global_variables_initializer())
 snapshot_loader.restore(sess, pretrained_model)
 
 ################################################################################

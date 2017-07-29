@@ -14,7 +14,7 @@ This repository contains the code for the following paper:
 Project Page: http://ronghanghu.com/text_objseg  
 
 ## Installation
-1. Install Google TensorFlow (v0.7.0 or higher) following the instructions [here](https://www.tensorflow.org/versions/master/get_started/os_setup.html).
+1. Install Google TensorFlow (v1.0.0 or higher) following the instructions [here](https://www.tensorflow.org/install/).
 2. Download this repository or clone with Git, and then `cd` into the root directory of the repository.
 
 ## Demo
